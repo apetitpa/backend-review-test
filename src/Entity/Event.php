@@ -28,7 +28,7 @@ class Event
     private string $type;
 
     /**
-     * @ORM\Column(type="integer", nullable=false, options={"default": 1})
+     * @ORM\Column(type="integer", nullable=false)
      */
     private int $count = 1;
 
