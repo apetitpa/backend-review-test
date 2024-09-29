@@ -9,6 +9,7 @@ $finder = PhpCsFixer\Finder::create()
     ->exclude('docker')
     ->notPath('bin/console')
     ->notPath('public/index.php')
+    ->notPath('tests/bootstrap.php')
 ;
 
 return (new PhpCsFixer\Config())
