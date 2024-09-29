@@ -8,7 +8,7 @@ use App\Entity\Enum\EventTypeEnum;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Table(name: '`event`')]
-#[ORM\Index(name: 'IDX_EVENT_TYPE', columns: ['type'])]
+#[ORM\Index(columns: ['type'], name: 'IDX_EVENT_TYPE')]
 #[ORM\Entity]
 class Event
 {
@@ -17,18 +17,18 @@ class Event
     #[ORM\GeneratedValue(strategy: 'NONE')]
     private int $id;
 
-    #[ORM\Column(type: 'string', enumType: 'App\Entity\Enum\EventTypeEnum', nullable: false)]
+    #[ORM\Column(type: 'string', nullable: false, enumType: EventTypeEnum::class)]
     private EventTypeEnum $type;
 
     #[ORM\Column(type: 'integer', nullable: false, options: ['default' => 1])]
     private int $count = 1;
 
     #[ORM\JoinColumn(name: 'actor_id', referencedColumnName: 'id')]
-    #[ORM\ManyToOne(targetEntity: \App\Entity\Actor::class, cascade: ['persist'])]
+    #[ORM\ManyToOne(targetEntity: Actor::class, cascade: ['persist'])]
     private Actor $actor;
 
     #[ORM\JoinColumn(name: 'repo_id', referencedColumnName: 'id')]
-    #[ORM\ManyToOne(targetEntity: \App\Entity\Repo::class, cascade: ['persist'])]
+    #[ORM\ManyToOne(targetEntity: Repo::class, cascade: ['persist'])]
     private Repo $repo;
 
     #[ORM\Column(type: 'json', nullable: false, options: ['jsonb' => true])]
@@ -50,7 +50,7 @@ class Event
         $this->createAt = $createAt;
         $this->comment = $comment;
 
-        if ($type === EventTypeEnum::COMMIT) {
+        if (EventTypeEnum::COMMIT === $type) {
             $this->count = $payload['size'] ?? 1;
         }
     }
@@ -60,7 +60,7 @@ class Event
         return $this->id;
     }
 
-    public function type(): string
+    public function type(): EventTypeEnum
     {
         return $this->type;
     }
