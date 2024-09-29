@@ -28,9 +28,7 @@ class EventController
         $this->serializer = $serializer;
     }
 
-    /**
-     * @Route(path="/api/event/{id}/update", name="api_commit_update", methods={"PUT"})
-     */
+    #[Route(path: '/api/event/{id}/update', name: 'api_commit_update', methods: ['PUT'])]
     public function update(Request $request, int $id, ValidatorInterface $validator): Response
     {
         $eventInput = $this->serializer->deserialize($request->getContent(), EventInput::class, 'json');

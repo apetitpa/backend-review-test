@@ -23,9 +23,7 @@ class SearchController
         $this->serializer = $serializer;
     }
 
-    /**
-     * @Route(path="/api/search", name="api_search", methods={"GET"})
-     */
+    #[Route(path: '/api/search', name: 'api_search', methods: ['GET'])]
     public function searchCommits(Request $request): JsonResponse
     {
         $searchInput = $this->serializer->denormalize($request->query->all(), SearchInput::class);
