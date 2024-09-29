@@ -28,7 +28,7 @@ class Event
     private string $type;
 
     /**
-     * @ORM\Column(type="integer", nullable=false)
+     * @ORM\Column(type="integer", nullable=false, options={"default": 1})
      */
     private int $count = 1;
 
@@ -98,6 +98,11 @@ class Event
     public function payload(): array
     {
         return $this->payload;
+    }
+
+    public function count(): int
+    {
+        return $this->count;
     }
 
     public function createAt(): \DateTimeImmutable

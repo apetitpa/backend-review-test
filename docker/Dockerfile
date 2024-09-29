@@ -28,6 +28,8 @@ RUN apk add --no-cache make
 RUN apk add --no-cache postgresql-dev bash \
     && docker-php-ext-install -j$(nproc) pdo_pgsql
 
+RUN echo "memory_limit=2048M" > /usr/local/etc/php/conf.d/memory-limit.ini
+
 # Installing Symfony CLI
 RUN apk add --no-cache bash && \
     curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.alpine.sh' | bash && \
