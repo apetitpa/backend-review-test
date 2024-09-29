@@ -32,22 +32,22 @@ class Actor
         $this->avatarUrl = $avatarUrl;
     }
 
-    public function id(): int
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function login(): string
+    public function getLogin(): string
     {
         return $this->login;
     }
 
-    public function url(): string
+    public function getUrl(): string
     {
         return $this->url;
     }
 
-    public function avatarUrl(): string
+    public function getAvatarUrl(): string
     {
         return $this->avatarUrl;
     }

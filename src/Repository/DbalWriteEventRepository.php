@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Dto\EventInput;
+use App\Dto\EventInputDto;
 use Doctrine\DBAL\Connection;
 
 class DbalWriteEventRepository implements WriteEventRepositoryInterface
@@ -13,13 +13,13 @@ class DbalWriteEventRepository implements WriteEventRepositoryInterface
     {
     }
 
-    public function update(EventInput $authorInput, int $id): void
+    public function update(EventInputDto $authorInput, int $id): void
     {
         $sql = <<<SQL
-        UPDATE event
-        SET comment = :comment
-        WHERE id = :id
-SQL;
+            UPDATE event
+            SET comment = :comment
+            WHERE id = :id
+        SQL;
 
         $this->connection->executeQuery($sql, ['id' => $id, 'comment' => $authorInput->comment]);
     }

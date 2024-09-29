@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Dto\EventInput;
+use App\Dto\EventInputDto;
 use App\Repository\ReadEventRepositoryInterface;
 use App\Repository\WriteEventRepositoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,15 +20,16 @@ class EventController
         private readonly WriteEventRepositoryInterface $writeEventRepository,
         private readonly ReadEventRepositoryInterface $readEventRepository,
         private readonly SerializerInterface $serializer,
+        private readonly ValidatorInterface $validator,
     ) {
     }
 
     #[Route(path: '/api/event/{id}/update', name: 'api_commit_update', methods: ['PUT'])]
-    public function update(Request $request, int $id, ValidatorInterface $validator): Response
+    public function update(Request $request, int $id): Response
     {
-        $eventInput = $this->serializer->deserialize($request->getContent(), EventInput::class, 'json');
+        $eventInput = $this->serializer->deserialize($request->getContent(), EventInputDto::class, 'json');
 
-        $errors = $validator->validate($eventInput);
+        $errors = $this->validator->validate($eventInput);
 
         if (\count($errors) > 0) {
             return new JsonResponse(

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Dto\SearchInput;
+use App\Dto\SearchInputDto;
 use Doctrine\DBAL\Connection;
 
 class DbalReadEventRepository implements ReadEventRepositoryInterface
@@ -13,18 +13,19 @@ class DbalReadEventRepository implements ReadEventRepositoryInterface
     {
     }
 
-    public function countAll(SearchInput $searchInput): int
+    public function countAll(SearchInputDto $searchInput): int
     {
         $sql = <<<SQL
-        SELECT sum(count) as count
-        FROM event
-        WHERE date(create_at) = :date
-        AND payload like %{$searchInput->keyword}%
-SQL;
+            SELECT SUM(count) AS count
+            FROM event
+            WHERE DATE(create_at) = :date
+            AND payload::text LIKE :keyword
+        SQL;
 
         /** @var string $result */
         $result = $this->connection->fetchOne($sql, [
             'date' => $searchInput->date,
+            'keyword' => "%{$searchInput->keyword}%",
         ]);
 
         return (int) $result;
@@ -33,37 +34,39 @@ SQL;
     /**
      * @return array<int|string, mixed>
      */
-    public function countByType(SearchInput $searchInput): array
+    public function countByType(SearchInputDto $searchInput): array
     {
-        $sql = <<<'SQL'
+        $sql = <<<SQL
             SELECT type, sum(count) as count
             FROM event
-            WHERE date(create_at) = :date
-            AND payload like %{$searchInput->keyword}%
+            WHERE DATE(create_at) = :date
+            AND payload::text LIKE :keyword
             GROUP BY type
-SQL;
+        SQL;
 
         return $this->connection->fetchAllKeyValue($sql, [
             'date' => $searchInput->date,
+            'keyword' => "%{$searchInput->keyword}%",
         ]);
     }
 
     /**
      * @return array<int, array<int|string, int>>
      */
-    public function statsByTypePerHour(SearchInput $searchInput): array
+    public function statsByTypePerHour(SearchInputDto $searchInput): array
     {
         $sql = <<<SQL
             SELECT extract(hour from create_at) as hour, type, sum(count) as count
             FROM event
             WHERE date(create_at) = :date
-            AND payload like %{$searchInput->keyword}%
+            AND payload::text LIKE :keyword
             GROUP BY TYPE, EXTRACT(hour from create_at)
-SQL;
+        SQL;
 
         /** @var array<int, array<string, int>> $stats */
         $stats = $this->connection->fetchAllKeyValue($sql, [
             'date' => $searchInput->date,
+            'keyword' => "%{$searchInput->keyword}%",
         ]);
 
         $data = array_fill(0, 24, ['commit' => 0, 'pullRequest' => 0, 'comment' => 0]);
@@ -78,14 +81,14 @@ SQL;
     /**
      * @return array<int, array<string, mixed>>
      */
-    public function getLatest(SearchInput $searchInput): array
+    public function getLatest(SearchInputDto $searchInput): array
     {
         $sql = <<<SQL
-            SELECT type, repo
+            SELECT type, repo_id
             FROM event
             WHERE date(create_at) = :date
-            AND payload like %{$searchInput->keyword}%
-SQL;
+            AND payload::text LIKE :keyword
+        SQL;
 
         /** @var array<int, array<string, string>> $result */
         $result = $this->connection->fetchAllAssociative($sql, [

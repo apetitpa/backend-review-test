@@ -25,3 +25,8 @@ services:
       - "database:db"
     ports:
       - "8888:8080"
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Dto\EventInput;
+use App\Dto\EventInputDto;
 
 interface WriteEventRepositoryInterface
 {
-    public function update(EventInput $authorInput, int $id): void;
+    public function update(EventInputDto $authorInput, int $id): void;
 }
