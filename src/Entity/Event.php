@@ -8,7 +8,8 @@ use App\Entity\Enum\EventTypeEnum;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Table(name: '`event`')]
-#[ORM\Index(columns: ['type'], name: 'IDX_EVENT_TYPE')]
+#[ORM\Index(name: 'IDX_EVENT_TYPE', columns: ['type'])]
+#[ORM\Index(name: 'IDX_EVENT_CREATE_AT', columns: ['create_at'])]
 #[ORM\Entity]
 class Event
 {
