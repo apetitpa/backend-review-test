@@ -90,18 +90,6 @@
     "doctrine/sql-formatter": {
         "version": "1.1.1"
     },
-    "fresh/doctrine-enum-bundle": {
-        "version": "7.4",
-        "recipe": {
-            "repo": "github.com/symfony/recipes-contrib",
-            "branch": "master",
-            "version": "6.0",
-            "ref": "fab86661c13bc12e4f14f706c86af09912d55bfb"
-        },
-        "files": [
-            "src/DBAL/Types/.gitignore"
-        ]
-    },
     "friendsofphp/proxy-manager-lts": {
         "version": "v1.0.3"
     },
@@ -420,9 +408,6 @@
     },
     "theseer/tokenizer": {
         "version": "1.2.1"
-    },
-    "twig/twig": {
-        "version": "v3.3.8"
     },
     "webmozart/assert": {
         "version": "1.10.0"

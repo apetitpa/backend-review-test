@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DataFixtures;
 
 use App\Entity\Actor;
+use App\Entity\Enum\EventTypeEnum;
 use App\Entity\Event;
-use App\Entity\EventType;
 use App\Entity\Repo;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -19,7 +21,7 @@ class EventFixtures extends Fixture
     {
         $event = new Event(
             self::EVENT_1_ID,
-            EventType::COMMENT,
+            EventTypeEnum::COMMENT,
             new Actor(
                 self::ACTOR_1_ID,
                 'jdoe',

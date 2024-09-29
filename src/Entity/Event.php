@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Entity\Enum\EventTypeEnum;
 use Doctrine\ORM\Mapping as ORM;
-use Webmozart\Assert\Assert;
 
 /**
  * @ORM\Entity()
@@ -23,12 +23,12 @@ class Event
     private int $id;
 
     /**
-     * @ORM\Column(type="EventType", nullable=false)
+     * @ORM\Column(type="string", enumType="App\Entity\Enum\EventTypeEnum", nullable=false)
      */
-    private string $type;
+    private EventTypeEnum $type;
 
     /**
-     * @ORM\Column(type="integer", nullable=false)
+     * @ORM\Column(type="integer", nullable=false, options={"default": 1})
      */
     private int $count = 1;
 
@@ -59,10 +59,9 @@ class Event
      */
     private ?string $comment;
 
-    public function __construct(int $id, string $type, Actor $actor, Repo $repo, array $payload, \DateTimeImmutable $createAt, ?string $comment)
+    public function __construct(int $id, EventTypeEnum $type, Actor $actor, Repo $repo, array $payload, \DateTimeImmutable $createAt, ?string $comment)
     {
         $this->id = $id;
-        EventType::assertValidChoice($type);
         $this->type = $type;
         $this->actor = $actor;
         $this->repo = $repo;
@@ -70,7 +69,7 @@ class Event
         $this->createAt = $createAt;
         $this->comment = $comment;
 
-        if ($type === EventType::COMMIT) {
+        if ($type === EventTypeEnum::COMMIT) {
             $this->count = $payload['size'] ?? 1;
         }
     }
@@ -98,6 +97,11 @@ class Event
     public function payload(): array
     {
         return $this->payload;
+    }
+
+    public function count(): int
+    {
+        return $this->count;
     }
 
     public function createAt(): \DateTimeImmutable
