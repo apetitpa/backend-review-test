@@ -92,12 +92,6 @@
             ".php-cs-fixer.dist.php"
         ]
     },
-    "friendsofphp/proxy-manager-lts": {
-        "version": "v1.0.3"
-    },
-    "laminas/laminas-code": {
-        "version": "4.0.0"
-    },
     "liip/functional-test-bundle": {
         "version": "4.5.1"
     },
@@ -352,9 +346,6 @@
     },
     "symfony/property-info": {
         "version": "v5.4.3"
-    },
-    "symfony/proxy-manager-bridge": {
-        "version": "v4.4.19"
     },
     "symfony/routing": {
         "version": "6.1",
