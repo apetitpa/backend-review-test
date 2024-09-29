@@ -22,11 +22,17 @@ class DbalReadEventRepository implements ReadEventRepositoryInterface
         AND payload like %{$searchInput->keyword}%
 SQL;
 
-        return (int) $this->connection->fetchOne($sql, [
+        /** @var string $result */
+        $result = $this->connection->fetchOne($sql, [
             'date' => $searchInput->date,
         ]);
+
+        return (int) $result;
     }
 
+    /**
+     * @return array<int|string, mixed>
+     */
     public function countByType(SearchInput $searchInput): array
     {
         $sql = <<<'SQL'
@@ -42,6 +48,9 @@ SQL;
         ]);
     }
 
+    /**
+     * @return array<int, array<int|string, int>>
+     */
     public function statsByTypePerHour(SearchInput $searchInput): array
     {
         $sql = <<<SQL
@@ -52,7 +61,8 @@ SQL;
             GROUP BY TYPE, EXTRACT(hour from create_at)
 SQL;
 
-        $stats = $this->connection->fetchAll($sql, [
+        /** @var array<int, array<string, int>> $stats */
+        $stats = $this->connection->fetchAllKeyValue($sql, [
             'date' => $searchInput->date,
         ]);
 
@@ -65,6 +75,9 @@ SQL;
         return $data;
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getLatest(SearchInput $searchInput): array
     {
         $sql = <<<SQL
@@ -74,18 +87,17 @@ SQL;
             AND payload like %{$searchInput->keyword}%
 SQL;
 
+        /** @var array<int, array<string, string>> $result */
         $result = $this->connection->fetchAllAssociative($sql, [
             'date' => $searchInput->date,
             'keyword' => $searchInput->keyword,
         ]);
 
-        $result = array_map(static function ($item) {
+        return array_map(static function (array $item): array {
             $item['repo'] = json_decode($item['repo'], true);
 
             return $item;
         }, $result);
-
-        return $result;
     }
 
     public function exist(int $id): bool

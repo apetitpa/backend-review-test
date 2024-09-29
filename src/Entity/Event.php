@@ -31,6 +31,9 @@ class Event
     #[ORM\ManyToOne(targetEntity: Repo::class, cascade: ['persist'])]
     private Repo $repo;
 
+    /**
+     * @var array<string, string|int|bool|array<string, mixed>>
+     */
     #[ORM\Column(type: 'json', nullable: false, options: ['jsonb' => true])]
     private array $payload;
 
@@ -40,6 +43,9 @@ class Event
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $comment;
 
+    /**
+     * @param array<string, string|int|bool|array<string, mixed>> $payload
+     */
     public function __construct(int $id, EventTypeEnum $type, Actor $actor, Repo $repo, array $payload, \DateTimeImmutable $createAt, ?string $comment)
     {
         $this->id = $id;
@@ -51,7 +57,7 @@ class Event
         $this->comment = $comment;
 
         if (EventTypeEnum::COMMIT === $type) {
-            $this->count = $payload['size'] ?? 1;
+            $this->count = isset($payload['size']) ? (int) $payload['size'] : 1;
         }
     }
 
@@ -75,6 +81,9 @@ class Event
         return $this->repo;
     }
 
+    /**
+     * @return array<string, string|int|bool|array<string, mixed>>
+     */
     public function payload(): array
     {
         return $this->payload;

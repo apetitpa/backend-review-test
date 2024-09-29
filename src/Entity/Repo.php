@@ -43,6 +43,9 @@ class Repo
         return $this->url;
     }
 
+    /**
+     * @param array<string, string> $data
+     */
     public static function fromArray(array $data): self
     {
         return new self(

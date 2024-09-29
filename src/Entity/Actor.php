@@ -52,6 +52,9 @@ class Actor
         return $this->avatarUrl;
     }
 
+    /**
+     * @param array<string, string> $data
+     */
     public static function fromArray(array $data): self
     {
         return new self(
