@@ -41,10 +41,14 @@ class GzippedJsonFileProcessorTest extends TestCase
         $processedLines = [];
 
         $this->fileProcessor->process($fileName, function ($line) use (&$processedLines) {
-            $processedLines[] = trim($line);
+            $processedLines[] = $line;
         });
 
-        $this->assertEquals($lines, $processedLines);
+        $this->assertEquals([
+            ["event" => "event1"],
+            ["event" => "event2"],
+            ["event" => "event3"],
+        ], $processedLines);
 
         unlink($fileName);
     }

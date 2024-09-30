@@ -12,6 +12,7 @@ use App\Service\FileDownloader;
 use App\Service\GzippedJsonFileProcessor;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -19,7 +20,7 @@ use Symfony\Component\Validator\ConstraintViolationList;
 class ImportGitHubEventsHandlerTest extends TestCase
 {
     private readonly FileDownloader $fileDownloader;
-    private readonly SerializerInterface $serializer;
+    private readonly DenormalizerInterface $denormalizer;
     private readonly ValidatorInterface $validator;
     private readonly GzippedJsonFileProcessor $fileProcessor;
     private readonly EventBatchImporter $batchImporter;
@@ -29,7 +30,7 @@ class ImportGitHubEventsHandlerTest extends TestCase
     protected function setUp(): void
     {
         $this->fileDownloader = $this->createMock(FileDownloader::class);
-        $this->serializer = $this->createMock(SerializerInterface::class);
+        $this->denormalizer = $this->createMock(DenormalizerInterface::class);
         $this->validator = $this->createMock(ValidatorInterface::class);
         $this->fileProcessor = $this->createMock(GzippedJsonFileProcessor::class);
         $this->batchImporter = $this->createMock(EventBatchImporter::class);
@@ -37,7 +38,7 @@ class ImportGitHubEventsHandlerTest extends TestCase
 
         $this->handler = new ImportGitHubEventsHandler(
             $this->fileDownloader,
-            $this->serializer,
+            $this->denormalizer,
             $this->validator,
             $this->fileProcessor,
             $this->batchImporter,
@@ -65,15 +66,15 @@ class ImportGitHubEventsHandlerTest extends TestCase
             ->method('process')
             ->with($fileName)
             ->willReturnCallback(function (string $fileName, callable $callback) {
-                $line = '{"id": 123, "type": "PushEvent", "actor": {}, "repo": {}, "created_at": "2024-09-29T12:34:56+00:00"}';
+                $line = ['id' => '123', 'type' => 'PushEvent', 'actor' => [], 'repo' => [], 'created_at' => '2024-09-29T12:34:56+00:00'];
                 $callback($line);
             });
 
         $importEvent = $this->createMock(ImportEvent::class);
-        $this->serializer
+        $this->denormalizer
             ->expects($this->once())
-            ->method('deserialize')
-            ->with('{"id": 123, "type": "PushEvent", "actor": {}, "repo": {}, "created_at": "2024-09-29T12:34:56+00:00"}', ImportEvent::class, 'json')
+            ->method('denormalize')
+            ->with(['id' => '123', 'type' => 'PushEvent', 'actor' => [], 'repo' => [], 'created_at' => '2024-09-29T12:34:56+00:00'], ImportEvent::class)
             ->willReturn($importEvent);
 
         $this->validator

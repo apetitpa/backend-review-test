@@ -35,8 +35,7 @@ class ImportEventDenormalizer implements DenormalizerInterface
 
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
-        return ImportEvent::class === $type
-            && 'json' === $format;
+        return ImportEvent::class === $type;
     }
 
     private function mapTypeToEventTpe(string $type): string

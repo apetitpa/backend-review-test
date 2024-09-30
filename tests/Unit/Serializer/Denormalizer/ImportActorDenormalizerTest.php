@@ -27,7 +27,7 @@ class ImportActorDenormalizerTest extends TestCase
         ];
 
         /** @var ImportActor $result */
-        $result = $this->importActorDenormalizer->denormalize($data, ImportActor::class, 'json');
+        $result = $this->importActorDenormalizer->denormalize($data, ImportActor::class);
 
         $this->assertInstanceOf(ImportActor::class, $result);
         $this->assertSame(456, $result->id);
@@ -38,8 +38,7 @@ class ImportActorDenormalizerTest extends TestCase
 
     public function testSupportsDenormalization(): void
     {
-        $this->assertTrue($this->importActorDenormalizer->supportsDenormalization([], ImportActor::class, 'json'));
-        $this->assertFalse($this->importActorDenormalizer->supportsDenormalization([], ImportActor::class, 'xml'));
-        $this->assertFalse($this->importActorDenormalizer->supportsDenormalization([], \stdClass::class, 'json'));
+        $this->assertTrue($this->importActorDenormalizer->supportsDenormalization([], ImportActor::class));
+        $this->assertFalse($this->importActorDenormalizer->supportsDenormalization([], \stdClass::class));
     }
 }

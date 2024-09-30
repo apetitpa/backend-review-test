@@ -11,7 +11,7 @@ use App\Service\FileDownloader;
 use App\Service\GzippedJsonFileProcessor;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[AsMessageHandler]
@@ -21,7 +21,7 @@ class ImportGitHubEventsHandler
 
     public function __construct(
         private readonly FileDownloader $fileDownloader,
-        private readonly SerializerInterface $serializer,
+        private readonly DenormalizerInterface $denormalizer,
         private readonly ValidatorInterface $validator,
         private readonly GzippedJsonFileProcessor $fileProcessor,
         private readonly EventBatchImporter $batchImporter,
@@ -45,11 +45,12 @@ class ImportGitHubEventsHandler
             return;
         }
 
-        $this->fileProcessor->process($fileName, function (string $line): void {
-            $event = $this->serializer->deserialize($line, ImportEvent::class, 'json');
+        $this->fileProcessor->process($fileName, function (array $data): void {
+            $event = $this->denormalizer->denormalize($data, ImportEvent::class);
+
             $errors = $this->validator->validate($event);
 
-            if (count($errors) > 0) {
+            if ($errors->count() > 0) {
                 return;
             }
 
@@ -59,5 +60,6 @@ class ImportGitHubEventsHandler
         $this->batchImporter->flush();
 
         unlink($fileName);
+        gc_collect_cycles();
     }
 }

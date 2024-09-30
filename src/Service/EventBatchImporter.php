@@ -15,7 +15,7 @@ class EventBatchImporter
     public function __construct(
         private readonly WriteEventRepository $writeEventRepository,
         private readonly LoggerInterface $logger,
-        private readonly int $batchSize = 500,
+        private readonly int $batchSize = 1000,
     ) {}
 
     public function addEvent(ImportEvent $event): void
@@ -39,6 +39,7 @@ class EventBatchImporter
             $this->logger->error('Failed to import batch', ['exception' => $e->getMessage()]);
         } finally {
             $this->eventBatch = [];
+            gc_collect_cycles();
         }
     }
 }

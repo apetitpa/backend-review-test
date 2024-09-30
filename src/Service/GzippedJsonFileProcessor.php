@@ -26,7 +26,7 @@ class GzippedJsonFileProcessor
                 continue;
             }
 
-            $lineProcessor($line);
+            $lineProcessor(json_decode($line, true));
         }
 
         gzclose($gzFileHandler);

@@ -36,6 +36,42 @@ SQL;
      */
     public function batchImport(array $importEvents): void
     {
+        [$actors, $repos, $events] = $this->prepareData($importEvents);
+
+        $this->connection->transactional(function () use ($actors, $repos, $events) {
+            $actorsList = array_values($actors);
+            $reposList = array_values($repos);
+
+            $this->bulkInsert('actor', ['id', 'login', 'url', 'avatar_url'], $actorsList);
+            $this->bulkInsert('repo', ['id', 'name', 'url'], $reposList);
+            $this->bulkInsert('event', ['id', 'actor_id', 'repo_id', 'type', 'count', 'payload', 'create_at', 'comment'], $events);
+        });
+    }
+
+    protected function bulkInsert(string $table, array $columns, array $values): void
+    {
+        if (empty($values)) {
+            return;
+        }
+
+        $columnsSql = implode(', ', $columns);
+        $placeholderForRow = '(' . implode(', ', array_fill(0, count($columns), '?')) . ')';
+        $placeholders = array_fill(0, count($values), $placeholderForRow);
+        $valuesSql = implode(', ', $placeholders);
+
+        $parameters = [];
+        foreach ($values as $row) {
+            foreach ($columns as $column) {
+                $parameters[] = $row[$column];
+            }
+        }
+
+        $sql = "INSERT INTO $table ($columnsSql) VALUES $valuesSql ON CONFLICT (id) DO NOTHING";
+        $this->connection->executeQuery($sql, $parameters);
+    }
+
+    private function prepareData(array $importEvents): array
+    {
         $actors = [];
         $repos = [];
         $events = [];
@@ -64,8 +100,8 @@ SQL;
 
             $events[] = [
                 'id' => $event->id,
-                'actor_id' => $event->actor->id,
-                'repo_id' => $event->repo->id,
+                'actor_id' => $actorId,
+                'repo_id' => $repoId,
                 'type' => $event->type,
                 'count' => $count,
                 'payload' => $jsonEncodedPayload,
@@ -74,35 +110,6 @@ SQL;
             ];
         }
 
-        $this->connection->transactional(function () use ($actors, $repos, $events) {
-            $actorsList = array_values($actors);
-            $reposList = array_values($repos);
-
-            $this->bulkInsert('actor', ['id', 'login', 'url', 'avatar_url'], $actorsList);
-            $this->bulkInsert('repo', ['id', 'name', 'url'], $reposList);
-            $this->bulkInsert('event', ['id', 'actor_id', 'repo_id', 'type', 'count', 'payload', 'create_at', 'comment'], $events);
-        });
-    }
-
-    private function bulkInsert(string $table, array $columns, array $values): void
-    {
-        if (empty($values)) {
-            return;
-        }
-
-        $columnsSql = implode(', ', $columns);
-        $placeholderForRow = '(' . implode(', ', array_fill(0, count($columns), '?')) . ')';
-        $placeholders = array_fill(0, count($values), $placeholderForRow);
-        $valuesSql = implode(', ', $placeholders);
-
-        $parameters = [];
-        foreach ($values as $row) {
-            foreach ($columns as $column) {
-                $parameters[] = $row[$column];
-            }
-        }
-
-        $sql = "INSERT INTO {$table} ({$columnsSql}) VALUES {$valuesSql} ON CONFLICT (id) DO NOTHING";
-        $this->connection->executeQuery($sql, $parameters);
+        return [$actors, $repos, $events];
     }
 }

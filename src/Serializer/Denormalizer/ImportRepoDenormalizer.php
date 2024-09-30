@@ -22,7 +22,6 @@ class ImportRepoDenormalizer implements DenormalizerInterface
 
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
-        return ImportRepo::class === $type
-            && 'json' === $format;
+        return ImportRepo::class === $type;
     }
 }

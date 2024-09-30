@@ -57,7 +57,7 @@ class ImportEventDenormalizerTest extends TestCase
             ->willReturn($importRepo);
 
         /** @var ImportEvent $result */
-        $result = $this->importEventDenormalizer->denormalize($data, ImportEvent::class, 'json');
+        $result = $this->importEventDenormalizer->denormalize($data, ImportEvent::class);
 
         $this->assertInstanceOf(ImportEvent::class, $result);
         $this->assertSame(123, $result->id);
@@ -70,8 +70,7 @@ class ImportEventDenormalizerTest extends TestCase
 
     public function testSupportsDenormalization(): void
     {
-        $this->assertTrue($this->importEventDenormalizer->supportsDenormalization([], ImportEvent::class, 'json'));
-        $this->assertFalse($this->importEventDenormalizer->supportsDenormalization([], ImportEvent::class, 'xml'));
-        $this->assertFalse($this->importEventDenormalizer->supportsDenormalization([], \stdClass::class, 'json'));
+        $this->assertTrue($this->importEventDenormalizer->supportsDenormalization([], ImportEvent::class));
+        $this->assertFalse($this->importEventDenormalizer->supportsDenormalization([], \stdClass::class));
     }
 }

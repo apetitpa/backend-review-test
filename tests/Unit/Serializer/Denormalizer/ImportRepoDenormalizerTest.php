@@ -26,7 +26,7 @@ class ImportRepoDenormalizerTest extends TestCase
         ];
 
         /** @var ImportRepo $result */
-        $result = $this->importRepoDenormalizer->denormalize($data, ImportRepo::class, 'json');
+        $result = $this->importRepoDenormalizer->denormalize($data, ImportRepo::class);
 
         $this->assertInstanceOf(ImportRepo::class, $result);
         $this->assertSame(123, $result->id);
@@ -36,8 +36,7 @@ class ImportRepoDenormalizerTest extends TestCase
 
     public function testSupportsDenormalization(): void
     {
-        $this->assertTrue($this->importRepoDenormalizer->supportsDenormalization([], ImportRepo::class, 'json'));
-        $this->assertFalse($this->importRepoDenormalizer->supportsDenormalization([], ImportRepo::class, 'xml'));
-        $this->assertFalse($this->importRepoDenormalizer->supportsDenormalization([], \stdClass::class, 'json'));
+        $this->assertTrue($this->importRepoDenormalizer->supportsDenormalization([], ImportRepo::class));
+        $this->assertFalse($this->importRepoDenormalizer->supportsDenormalization([], \stdClass::class));
     }
 }
