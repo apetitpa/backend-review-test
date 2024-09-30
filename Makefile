@@ -24,7 +24,7 @@ CURRENT_USER := $(shell id -u)
 CURRENT_GROUP := $(shell id -g)
 
 TTY   := $(shell tty -s || echo '-T')
-DOCKER_COMPOSE := FIXUID=$(CURRENT_USER) FIXGID=$(CURRENT_GROUP) docker-compose
+DOCKER_COMPOSE := FIXUID=$(CURRENT_USER) FIXGID=$(CURRENT_GROUP) docker compose
 PHP_RUN := $(DOCKER_COMPOSE) run $(TTY) --no-deps --rm php
 PHP_EXEC := $(DOCKER_COMPOSE) exec $(TTY) php
 
@@ -108,4 +108,16 @@ unit-test: vendor ## Run PhpUnit unit testsuite
 func-test: var/docker.up ## Run PhpUnit functionnal testsuite
 	@$(call log,Running ...)
 	$(PHP_EXEC) bin/phpunit -v --testsuite func --testdox
+	@$(call log_success,Done)
+
+.PHONY: phpstan
+phpstan:
+	@$(call log,Running ...)
+	@$(PHP_EXEC) vendor/bin/phpstan analyse
+	@$(call log_success,Done)
+
+.PHONY: php-cs-fixer
+php-cs-fixer:
+	@$(call log,Running ...)
+	@$(PHP_EXEC) vendor/bin/php-cs-fixer fix
 	@$(call log_success,Done)

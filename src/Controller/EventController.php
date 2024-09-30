@@ -1,41 +1,35 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
-use App\Dto\EventInput;
-use App\Repository\ReadEventRepository;
-use App\Repository\WriteEventRepository;
+use App\Dto\EventInputDto;
+use App\Repository\ReadEventRepositoryInterface;
+use App\Repository\WriteEventRepositoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class EventController
 {
-    private WriteEventRepository $writeEventRepository;
-    private ReadEventRepository $readEventRepository;
-    private SerializerInterface $serializer;
-
     public function __construct(
-        WriteEventRepository $writeEventRepository,
-        ReadEventRepository $readEventRepository,
-        SerializerInterface $serializer
+        private readonly WriteEventRepositoryInterface $writeEventRepository,
+        private readonly ReadEventRepositoryInterface $readEventRepository,
+        private readonly SerializerInterface $serializer,
+        private readonly ValidatorInterface $validator,
     ) {
-        $this->writeEventRepository = $writeEventRepository;
-        $this->readEventRepository = $readEventRepository;
-        $this->serializer = $serializer;
     }
 
-    /**
-     * @Route(path="/api/event/{id}/update", name="api_commit_update", methods={"PUT"})
-     */
-    public function update(Request $request, int $id, ValidatorInterface $validator): Response
+    #[Route(path: '/api/event/{id}/update', name: 'api_commit_update', methods: ['PUT'])]
+    public function update(Request $request, int $id): Response
     {
-        $eventInput = $this->serializer->deserialize($request->getContent(), EventInput::class, 'json');
+        $eventInput = $this->serializer->deserialize($request->getContent(), EventInputDto::class, 'json');
 
-        $errors = $validator->validate($eventInput);
+        $errors = $this->validator->validate($eventInput);
 
         if (\count($errors) > 0) {
             return new JsonResponse(
@@ -44,9 +38,9 @@ class EventController
             );
         }
 
-        if($this->readEventRepository->exist($id) === false) {
+        if (false === $this->readEventRepository->exist($id)) {
             return new JsonResponse(
-                ['message' => sprintf('Event identified by %d not found !', $id)],
+                ['message' => \sprintf('Event identified by %d not found !', $id)],
                 Response::HTTP_NOT_FOUND
             );
         }

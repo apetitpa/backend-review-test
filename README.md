@@ -103,6 +103,8 @@ clean                          Clean the docker stack
 vendor                         Install composer dependencies
 unit-test                      Run PhpUnit unit testsuite
 func-test                      Run PhpUnit functionnal testsuite
+phpstan                        Run PHPStan
+php-cs-fixer                   Run PHP-CS-Fixer
 ```
 **We encourage you to have fun during this challenge!**
 

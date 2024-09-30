@@ -1,4 +1,4 @@
-FROM php:8.1-fpm-alpine
+FROM php:8.3-fpm-alpine
 
 # Install composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -10,7 +10,7 @@ RUN addgroup -g 1000 docker && \
 # Installing fixuid (https://github.com/boxboat/fixuid)
 RUN USER=docker && \
     GROUP=docker && \
-    curl -SsL https://github.com/boxboat/fixuid/releases/download/v0.5/fixuid-0.5-linux-amd64.tar.gz | tar -C /usr/local/bin -xzf - && \
+    curl -SsL https://github.com/boxboat/fixuid/releases/download/v0.6.0/fixuid-0.6.0-linux-amd64.tar.gz | tar -C /usr/local/bin -xzf - && \
     chown root:root /usr/local/bin/fixuid && \
     chmod 4755 /usr/local/bin/fixuid && \
     mkdir -p /etc/fixuid && \
@@ -27,6 +27,11 @@ RUN apk add --no-cache make
 # Install php extensions
 RUN apk add --no-cache postgresql-dev bash \
     && docker-php-ext-install -j$(nproc) pdo_pgsql
+
+# Install redis extension
+RUN apk add --no-cache pcre-dev $PHPIZE_DEPS \
+    && pecl install redis \
+    && docker-php-ext-enable redis.so
 
 # Installing Symfony CLI
 RUN apk add --no-cache bash && \

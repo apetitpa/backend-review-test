@@ -4,65 +4,52 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Entity\Enum\EventTypeEnum;
 use Doctrine\ORM\Mapping as ORM;
-use Webmozart\Assert\Assert;
 
-/**
- * @ORM\Entity()
- * @ORM\Table(name="`event`",
- *    indexes={@ORM\Index(name="IDX_EVENT_TYPE", columns={"type"})}
- * )
- */
+#[ORM\Table(name: '`event`')]
+#[ORM\Index(name: 'IDX_EVENT_TYPE', columns: ['type'])]
+#[ORM\Index(name: 'IDX_EVENT_CREATE_AT', columns: ['create_at'])]
+#[ORM\Entity]
 class Event
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="bigint")
-     * @ORM\GeneratedValue(strategy="NONE")
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint')]
+    #[ORM\GeneratedValue(strategy: 'NONE')]
     private int $id;
 
-    /**
-     * @ORM\Column(type="EventType", nullable=false)
-     */
-    private string $type;
+    #[ORM\Column(type: 'string', nullable: false, enumType: EventTypeEnum::class)]
+    private EventTypeEnum $type;
 
-    /**
-     * @ORM\Column(type="integer", nullable=false)
-     */
+    #[ORM\Column(type: 'integer', nullable: false, options: ['default' => 1])]
     private int $count = 1;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Actor", cascade={"persist"})
-     * @ORM\JoinColumn(name="actor_id", referencedColumnName="id")
-     */
+    #[ORM\JoinColumn(name: 'actor_id', referencedColumnName: 'id')]
+    #[ORM\ManyToOne(targetEntity: Actor::class, cascade: ['persist'])]
     private Actor $actor;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Repo", cascade={"persist"})
-     * @ORM\JoinColumn(name="repo_id", referencedColumnName="id")
-     */
+    #[ORM\JoinColumn(name: 'repo_id', referencedColumnName: 'id')]
+    #[ORM\ManyToOne(targetEntity: Repo::class, cascade: ['persist'])]
     private Repo $repo;
 
     /**
-     * @ORM\Column(type="json", nullable=false, options={"jsonb": true})
+     * @var array<string, string|int|bool|array<string, mixed>>
      */
+    #[ORM\Column(type: 'json', nullable: false, options: ['jsonb' => true])]
     private array $payload;
 
-    /**
-     * @ORM\Column(type="datetime_immutable", nullable=false)
-     */
+    #[ORM\Column(type: 'datetime_immutable', nullable: false)]
     private \DateTimeImmutable $createAt;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $comment;
 
-    public function __construct(int $id, string $type, Actor $actor, Repo $repo, array $payload, \DateTimeImmutable $createAt, ?string $comment)
+    /**
+     * @param array<string, string|int|bool|array<string, mixed>> $payload
+     */
+    public function __construct(int $id, EventTypeEnum $type, Actor $actor, Repo $repo, array $payload, \DateTimeImmutable $createAt, ?string $comment)
     {
         $this->id = $id;
-        EventType::assertValidChoice($type);
         $this->type = $type;
         $this->actor = $actor;
         $this->repo = $repo;
@@ -70,37 +57,45 @@ class Event
         $this->createAt = $createAt;
         $this->comment = $comment;
 
-        if ($type === EventType::COMMIT) {
-            $this->count = $payload['size'] ?? 1;
+        if (EventTypeEnum::COMMIT === $type) {
+            $this->count = isset($payload['size']) ? (int) $payload['size'] : 1;
         }
     }
 
-    public function id(): int
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function type(): string
+    public function getType(): EventTypeEnum
     {
         return $this->type;
     }
 
-    public function actor(): Actor
+    public function getActor(): Actor
     {
         return $this->actor;
     }
 
-    public function repo(): Repo
+    public function getRepo(): Repo
     {
         return $this->repo;
     }
 
-    public function payload(): array
+    /**
+     * @return array<string, string|int|bool|array<string, mixed>>
+     */
+    public function getPayload(): array
     {
         return $this->payload;
     }
 
-    public function createAt(): \DateTimeImmutable
+    public function getCount(): int
+    {
+        return $this->count;
+    }
+
+    public function getCreateAt(): \DateTimeImmutable
     {
         return $this->createAt;
     }
