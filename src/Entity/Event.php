@@ -100,6 +100,11 @@ class Event
         return $this->payload;
     }
 
+    public function count(): int
+    {
+        return $this->count;
+    }
+
     public function createAt(): \DateTimeImmutable
     {
         return $this->createAt;

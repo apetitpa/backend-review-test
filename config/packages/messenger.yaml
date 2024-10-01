@@ -1,0 +1,20 @@
+framework:
+    messenger:
+        failure_transport: failed
+        transports:
+            sync: 'sync://'
+            async:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                retry_strategy:
+                  max_retries: 3
+                  delay: 1000
+                  multiplier: 2
+            failed: '%env(MESSENGER_FAILED_TRANSPORT_DSN)%'
+        routing:
+          'App\Message\ImportGitHubEventsMessage': async
+
+# when@dev:
+#    framework:
+#        messenger:
+#            transports:
+#                async: 'sync://'
